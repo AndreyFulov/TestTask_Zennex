@@ -40,9 +40,9 @@ cp .env.example .env
 ```
 
     1. Сгенерируйте ключ приложения
-```bash
-php artisan key:generate
-```
+    ```bash
+    php artisan key:generate
+    ```
     2. Откройте .env файл и настройте параметры подключения к базе данных, а также другие параметры окружения:
 ```env
 DB_CONNECTION=mysql
