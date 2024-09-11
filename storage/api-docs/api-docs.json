@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Laravel API Documentation",
-        "version": "1.0.0"
+        "title": "Zennex API Documentation",
+        "version": "1.0.1"
     },
     "paths": {
         "/api/register": {
@@ -122,11 +122,25 @@
                 "tags": [
                     "Notes"
                 ],
-                "summary": "Получить все заметки пользователя",
+                "summary": "Получение списка заметок",
+                "description": "Возвращает список всех заметок",
                 "operationId": "9a95bde5931986ad60b9f7f414ec425e",
                 "responses": {
                     "200": {
-                        "description": "Список заметок"
+                        "description": "Список заметок",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Note"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Заметки не найдены"
                     }
                 }
             },
@@ -225,16 +239,49 @@
                     }
                 }
             },
-            "put": {
+            "delete": {
                 "tags": [
                     "Notes"
                 ],
-                "summary": "Обновить заметку",
-                "operationId": "c7e6224fadd6d82b81ded7615279a15c",
+                "summary": "Удалить заметку",
+                "operationId": "99b63679b2822651f8f0ae585f927f0b",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID заметки",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Заметка успешно удалена"
+                    },
+                    "404": {
+                        "description": "Заметка не найдена"
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                }
+            }
+        },
+        "/notes/{id}": {
+            "put": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "Обновление заметки",
+                "description": "Обновляет существующую заметку и синхронизирует теги.",
+                "operationId": "29a9163f38861fad93ae0510c516c5cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID заметки для обновления",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -246,14 +293,25 @@
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "title",
+                                    "content"
+                                ],
                                 "properties": {
                                     "title": {
-                                        "type": "string",
-                                        "example": "Обновленный заголовок"
+                                        "description": "Заголовок заметки",
+                                        "type": "string"
                                     },
                                     "content": {
-                                        "type": "string",
-                                        "example": "Обновленное содержание"
+                                        "description": "Содержимое заметки",
+                                        "type": "string"
+                                    },
+                                    "tags": {
+                                        "description": "Массив тегов",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -263,39 +321,62 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Заметка обновлена"
+                        "description": "Успешное обновление заметки",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Note"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен"
                     },
                     "404": {
                         "description": "Заметка не найдена"
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/notes/search-by-tags": {
+            "get": {
                 "tags": [
                     "Notes"
                 ],
-                "summary": "Delete a specific note",
-                "operationId": "99b63679b2822651f8f0ae585f927f0b",
+                "summary": "Поиск заметок по тегам",
+                "description": "Возвращает список заметок, соответствующих переданным тегам.",
+                "operationId": "0e11a7fe1fb54fff2cbbaa6c93836119",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the note",
+                        "name": "tags",
+                        "in": "query",
+                        "description": "Массив тегов для поиска заметок",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Note deleted successfully"
+                    "200": {
+                        "description": "Список заметок",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Note"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Note not found"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Неверный запрос"
                     }
                 }
             }
@@ -305,14 +386,25 @@
                 "tags": [
                     "Tags"
                 ],
-                "summary": "Get a list of tags",
+                "summary": "Получение списка тегов",
+                "description": "Возвращает список всех тегов",
                 "operationId": "4d0f4baf9e6fa992c0d85fbf140ebf17",
                 "responses": {
                     "200": {
-                        "description": "List of tags"
+                        "description": "Список тегов",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Tag"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "404": {
+                        "description": "Теги не найдены"
                     }
                 }
             },
@@ -359,32 +451,55 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "ID of the note",
+                        "description": "ID заметки",
                         "type": "integer",
                         "format": "int64"
                     },
                     "title": {
-                        "description": "Title of the note",
+                        "description": "Название заметки",
                         "type": "string"
                     },
                     "content": {
-                        "description": "Content of the note",
+                        "description": "Контент заметки",
                         "type": "string"
                     },
                     "user_id": {
-                        "description": "ID of the user who created the note",
+                        "description": "ID пользователя создавшего заметку",
                         "type": "integer",
                         "format": "int64"
                     },
                     "created_at": {
-                        "description": "Creation timestamp",
+                        "description": "Метка даты",
                         "type": "string",
                         "format": "date-time"
                     },
                     "updated_at": {
-                        "description": "Last update timestamp",
+                        "description": "Последнее обновление",
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Tag": {
+                "title": "Tag",
+                "description": "Модель тега",
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Идентификатор тега",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Название тега",
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "description": "ID пользователя, которому принадлежит тег",
+                        "type": "integer"
                     }
                 },
                 "type": "object"

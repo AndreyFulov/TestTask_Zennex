@@ -15,35 +15,35 @@ class Note extends Model
  *         property="id",
  *         type="integer",
  *         format="int64",
- *         description="ID of the note"
+ *         description="ID заметки"
  *     ),
  *     @OA\Property(
  *         property="title",
  *         type="string",
- *         description="Title of the note"
+ *         description="Название заметки"
  *     ),
  *     @OA\Property(
  *         property="content",
  *         type="string",
- *         description="Content of the note"
+ *         description="Контент заметки"
  *     ),
  *     @OA\Property(
  *         property="user_id",
  *         type="integer",
  *         format="int64",
- *         description="ID of the user who created the note"
+ *         description="ID пользователя создавшего заметку"
  *     ),
  *     @OA\Property(
  *         property="created_at",
  *         type="string",
  *         format="date-time",
- *         description="Creation timestamp"
+ *         description="Метка даты"
  *     ),
  *     @OA\Property(
  *         property="updated_at",
  *         type="string",
  *         format="date-time",
- *         description="Last update timestamp"
+ *         description="Последнее обновление"
  *     )
  * )
  */

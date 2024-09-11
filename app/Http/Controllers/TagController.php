@@ -4,28 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Tag;
+use App\Http\Resources\TagResource;
 
 class TagController extends Controller
 {
- /**
-     * @OA\Get(
-     *     path="/api/tags",
-     *     tags={"Tags"},
-     *     summary="Get a list of tags",
-     *     @OA\Response(
-     *         response=200,
-     *         description="List of tags"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized"
-     *     )
-     * )
-     */
+/**
+ * @OA\Get(
+ *     path="/api/tags",
+ *     summary="Получение списка тегов",
+ *     description="Возвращает список всех тегов",
+ *     tags={"Tags"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Список тегов",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/Tag")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Теги не найдены"
+ *     )
+ * )
+ */
     public function index()
     {
-        $tags = Tag::all();
-        return response()->json($tags, 200);
+        $tags = auth()->user()->tags()->get();
+        return TagResource::collection($tags);
     }
      /**
      * @OA\Post(
@@ -50,11 +56,11 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:tags,name',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
         ]);
-
-        $tag = Tag::create($request->only('name'));
-        return response()->json($tag, 201);
+    
+        $tag = auth()->user()->tags()->create($validatedData);
+        return new TagResource($tag);
     }
 }
